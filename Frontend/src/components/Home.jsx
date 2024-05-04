@@ -1,15 +1,19 @@
 import React, { useState } from "react";
 import { FaFileWord } from "react-icons/fa6";
 import axios from "axios";
+import { css } from "@emotion/react";
+import { RingLoader } from "react-spinners";
+
 function Home() {
   const [selectedFile, setSelectedFile] = useState(null);
+  const [converting, setConverting] = useState(false); // State to track conversion process
   const [convert, setConvert] = useState("");
   const [downloadError, setDownloadError] = useState("");
 
   const handleFileChange = (e) => {
-    // console.log(e.target.files[0]);
     setSelectedFile(e.target.files[0]);
   };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
     if (!selectedFile) {
@@ -18,6 +22,7 @@ function Home() {
     }
     const formData = new FormData();
     formData.append("file", selectedFile);
+    setConverting(true); // Set converting state to true when conversion starts
     try {
       const response = await axios.post(
         "http://localhost:3000/convertFile",
@@ -26,34 +31,36 @@ function Home() {
           responseType: "blob",
         }
       );
-      console.log(response.data);
       const url = window.URL.createObjectURL(new Blob([response.data]));
-      console.log(url);
       const link = document.createElement("a");
-      console.log(link);
       link.href = url;
-      console.log(link);
       link.setAttribute(
         "download",
         selectedFile.name.replace(/\.[^/.]+$/, "") + ".pdf"
       );
-      console.log(link);
       document.body.appendChild(link);
-      console.log(link);
       link.click();
       link.parentNode.removeChild(link);
       setSelectedFile(null);
       setDownloadError("");
       setConvert("File Converted Successfully");
     } catch (error) {
-      console.log(error);
-      if (error.response && error.response.status == 400) {
-        setDownloadError("Error occurred: ", error.response.data.message);
+      if (error.response && error.response.status === 400) {
+        setDownloadError("Error occurred: " + error.response.data.message);
       } else {
         setConvert("");
       }
+    } finally {
+      setConverting(false); // Set converting state to false when conversion ends
     }
   };
+
+  const override = css`
+    display: block;
+    margin: 0 auto;
+    border-color: red;
+  `;
+
   return (
     <>
       <div className="max-w-screen-2xl mx-auto container px-6 py-3 md:px-40">
@@ -86,10 +93,10 @@ function Home() {
               </label>
               <button
                 onClick={handleSubmit}
-                disabled={!selectedFile}
+                disabled={!selectedFile || converting} // Disable button when converting
                 className="text-white bg-blue-500 hover:bg-blue-700 disabled:bg-gray-400 disabled:pointer-events-none duration-300 font-bold px-4 py-2 rounded-lg"
               >
-                Convert File
+                {converting ? "Converting..." : "Convert File"}
               </button>
               {convert && (
                 <div className="text-green-500 text-center">{convert}</div>
@@ -99,6 +106,16 @@ function Home() {
               )}
             </div>
           </div>
+          {converting && (
+            <div className="absolute inset-0 flex items-center justify-center bg-gray-500 bg-opacity-50">
+              <RingLoader
+                color="#4A90E2"
+                loading={converting}
+                css={override}
+                size={150}
+              />
+            </div>
+          )}
         </div>
       </div>
     </>
