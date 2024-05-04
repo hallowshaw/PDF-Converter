@@ -6,7 +6,7 @@ import { RingLoader } from "react-spinners";
 
 function Home() {
   const [selectedFile, setSelectedFile] = useState(null);
-  const [converting, setConverting] = useState(false); // State to track conversion process
+  const [converting, setConverting] = useState(false);
   const [convert, setConvert] = useState("");
   const [downloadError, setDownloadError] = useState("");
 
@@ -22,7 +22,7 @@ function Home() {
     }
     const formData = new FormData();
     formData.append("file", selectedFile);
-    setConverting(true); // Set converting state to true when conversion starts
+    setConverting(true);
     try {
       const response = await axios.post(
         "http://localhost:3000/convertFile",
@@ -51,7 +51,7 @@ function Home() {
         setConvert("");
       }
     } finally {
-      setConverting(false); // Set converting state to false when conversion ends
+      setConverting(false);
     }
   };
 
@@ -84,7 +84,7 @@ function Home() {
               />
               <label
                 htmlFor="FileInput"
-                className="w-full flex items-center justify-center px-4 py-6 bg-gray-100 text-gray-700 rounded-lg shadow-lg cursor-pointer border-blue-300 hover:bg-blue-700 duration-300 hover:text-white"
+                className="w-full flex items-center justify-center px-4 py-6 bg-gray-100 text-gray-700 rounded-lg shadow-lg cursor-pointer border-blue-300 hover:bg-blue-200 duration-300 hover:text-blue-900"
               >
                 <FaFileWord className="text-3xl mr-3" />
                 <span className="text-2xl mr-2 ">
@@ -93,8 +93,12 @@ function Home() {
               </label>
               <button
                 onClick={handleSubmit}
-                disabled={!selectedFile || converting} // Disable button when converting
-                className="text-white bg-blue-500 hover:bg-blue-700 disabled:bg-gray-400 disabled:pointer-events-none duration-300 font-bold px-4 py-2 rounded-lg"
+                disabled={!selectedFile || converting}
+                className={`text-white bg-blue-500 hover:bg-blue-600 ${
+                  converting
+                    ? "bg-gray-300 cursor-not-allowed"
+                    : "hover:bg-blue-700"
+                } disabled:bg-gray-400 disabled:pointer-events-none duration-300 font-bold px-4 py-2 rounded-lg`}
               >
                 {converting ? "Converting..." : "Convert File"}
               </button>

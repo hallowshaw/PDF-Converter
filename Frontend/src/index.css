@@ -1,3 +1,14 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+/* Dark mode styles */
+.dark {
+  --bg-color: #161629; /* Background color */
+  --text-color: #fff; /* Text color */
+}
+
+/* Apply dark mode styles */
+.dark {
+  background-color: var(--bg-color);
+  color: var(--text-color);
+}
